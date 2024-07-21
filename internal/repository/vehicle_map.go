@@ -2,6 +2,11 @@ package repository
 
 import (
 	"app/pkg/models"
+	"errors"
+)
+
+var (
+	errVehicleAlreadyExists = errors.New("vehicle already exists")
 )
 
 // NewVehicleMap is a function that returns a new instance of VehicleMap
@@ -32,4 +37,20 @@ func (r *VehicleMap) FindAll() (v map[int]models.Vehicle, err error) {
 	return
 }
 
+// Create is a method that returns a Vehicle struct
+func (r *VehicleMap) Create(v models.Vehicle) (err error) {
+	// Get id
+	id := v.Id
 
+	//Verify if id already exist
+	_, ok := r.db[id]
+
+	if ok {
+		return errVehicleAlreadyExists
+	}
+
+	//Insert
+	r.db[id] = v
+
+	return nil
+}

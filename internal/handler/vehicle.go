@@ -2,7 +2,10 @@ package handler
 
 import (
 	"app/internal/service"
+	"app/pkg/errors"
+	"app/pkg/helpers"
 	"app/pkg/models"
+	"encoding/json"
 	"net/http"
 
 	"github.com/bootcamp-go/web/response"
@@ -57,5 +60,56 @@ func (h *VehicleDefault) GetAll() http.HandlerFunc {
 			"message": "success",
 			"data":    data,
 		})
+	}
+}
+
+// 	201 Created: Vehículo creado exitosamente.
+// 400 Bad Request: Datos del vehículo mal formados o incompletos.
+// 409 Conflict: Identificador del vehículo ya existente.
+
+// Create is a method that add new vehicle, returns a handler for the route POST /vehicles
+func (h *VehicleDefault) Create() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var newVehicleDoc models.VehicleDoc
+
+		if err := json.NewDecoder(r.Body).Decode(&newVehicleDoc); err != nil {
+			helpers.RespondWithError(w, errors.NewBadRequest("Datos del vehículo mal formados o incompletos.", err))
+			return
+		}
+
+		v := models.Vehicle{
+			Id: newVehicleDoc.ID,
+			VehicleAttributes: models.VehicleAttributes{
+				Brand:           newVehicleDoc.Brand,
+				Model:           newVehicleDoc.Model,
+				Registration:    newVehicleDoc.Registration,
+				Color:           newVehicleDoc.Color,
+				FabricationYear: newVehicleDoc.FabricationYear,
+				Capacity:        newVehicleDoc.Capacity,
+				MaxSpeed:        newVehicleDoc.MaxSpeed,
+				FuelType:        newVehicleDoc.FuelType,
+				Transmission:    newVehicleDoc.Transmission,
+				Weight:          newVehicleDoc.Weight,
+				Dimensions: models.Dimensions{
+					Height: newVehicleDoc.Height,
+					Length: newVehicleDoc.Length,
+					Width:  newVehicleDoc.Width,
+				},
+			},
+		}
+
+		if err := v.Validate(); err != nil {
+			helpers.RespondWithError(w, errors.NewBadRequest("Datos del vehículo mal formados o incompletos.", err))
+			return
+		}
+
+		err := h.sv.Create(v)
+		if err != nil {
+			helpers.RespondWithError(w, errors.NewConflict("Identificador del vehículo ya existente."))
+		} else {
+			helpers.RespondWithJSON(w, http.StatusCreated, v)
+
+		}
+
 	}
 }

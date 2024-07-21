@@ -1,5 +1,9 @@
 package models
 
+import (
+	"errors"
+)
+
 // Dimensions is a struct that represents a dimension in 3d
 type Dimensions struct {
 	// Height is the height of the dimension
@@ -61,4 +65,28 @@ type Vehicle struct {
 
 	// VehicleAttribute is the attributes of a vehicle
 	VehicleAttributes
+}
+
+// Validate checks if the vehicle data is valid
+func (v *Vehicle) Validate() error {
+	// Check mandatory fields
+	if v.Brand == "" || v.Model == "" || v.Registration == "" {
+		return errors.New("los campos Brand, Model y Registration son obligatorios")
+	}
+
+	// Additional custom validations if needed
+	if v.FabricationYear < 1900 || v.FabricationYear > 2100 {
+		return errors.New("año de fabricación fuera de rango válido")
+	}
+
+	// Example of a specific validation using dimensions
+	if v.Dimensions.Height <= 0 || v.Dimensions.Length <= 0 || v.Dimensions.Width <= 0 {
+		return errors.New("dimensiones inválidas")
+	}
+
+	if v.Capacity == 0 {
+		return errors.New("el atributo pasajers no puede ser 0")
+	}
+
+	return nil
 }
