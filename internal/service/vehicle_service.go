@@ -8,5 +8,5 @@ type VehicleService interface {
 	FindAll() (v map[int]models.Vehicle, err error)
 
 	//Create is a method that add vehicle to map returns a error if vehicle already exist
-	Create(v models.Vehicle) (err error)
+	Create(v models.VehicleDoc) (err error)
 }

@@ -1,11 +1,14 @@
 package handler
 
 import (
+	"app/internal/repository"
 	"app/internal/service"
-	"app/pkg/errors"
+	appErrors "app/pkg/errors"
 	"app/pkg/helpers"
 	"app/pkg/models"
 	"encoding/json"
+	"errors"
+	"log"
 	"net/http"
 
 	"github.com/bootcamp-go/web/response"
@@ -73,43 +76,25 @@ func (h *VehicleDefault) Create() http.HandlerFunc {
 		var newVehicleDoc models.VehicleDoc
 
 		if err := json.NewDecoder(r.Body).Decode(&newVehicleDoc); err != nil {
-			helpers.RespondWithError(w, errors.NewBadRequest("Datos del vehículo mal formados o incompletos.", err))
+			helpers.RespondWithError(w, appErrors.NewBadRequest("Datos del vehículo mal formados o incompletos.", err))
 			return
 		}
 
-		v := models.Vehicle{
-			Id: newVehicleDoc.ID,
-			VehicleAttributes: models.VehicleAttributes{
-				Brand:           newVehicleDoc.Brand,
-				Model:           newVehicleDoc.Model,
-				Registration:    newVehicleDoc.Registration,
-				Color:           newVehicleDoc.Color,
-				FabricationYear: newVehicleDoc.FabricationYear,
-				Capacity:        newVehicleDoc.Capacity,
-				MaxSpeed:        newVehicleDoc.MaxSpeed,
-				FuelType:        newVehicleDoc.FuelType,
-				Transmission:    newVehicleDoc.Transmission,
-				Weight:          newVehicleDoc.Weight,
-				Dimensions: models.Dimensions{
-					Height: newVehicleDoc.Height,
-					Length: newVehicleDoc.Length,
-					Width:  newVehicleDoc.Width,
-				},
-			},
-		}
-
-		if err := v.Validate(); err != nil {
-			helpers.RespondWithError(w, errors.NewBadRequest("Datos del vehículo mal formados o incompletos.", err))
-			return
-		}
-
-		err := h.sv.Create(v)
+		err := h.sv.Create(newVehicleDoc)
 		if err != nil {
-			helpers.RespondWithError(w, errors.NewConflict("Identificador del vehículo ya existente."))
-		} else {
-			helpers.RespondWithJSON(w, http.StatusCreated, v)
+			log.Println(err)
 
+			//Comparate  vehicle already exists
+			if errors.Is(err, repository.ErrVehicleAlreadyExists) {
+				helpers.RespondWithError(w, appErrors.NewConflict("Identificador del vehículo ya existente."))
+				return
+			}
+
+			helpers.RespondWithError(w, appErrors.NewBadRequest("Datos del vehículo mal formados o incompletos.", err))
+			return
 		}
+
+		helpers.RespondWithJSON(w, http.StatusCreated, newVehicleDoc)
 
 	}
 }

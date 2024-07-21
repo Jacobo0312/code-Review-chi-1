@@ -23,7 +23,32 @@ func (s *VehicleDefault) FindAll() (v map[int]models.Vehicle, err error) {
 }
 
 // Create is a method that add vehicle to map returns a error if vehicle already exist
-func (s *VehicleDefault) Create(v models.Vehicle) (err error) {
-	err = s.rp.Create(v)
+func (s *VehicleDefault) Create(v models.VehicleDoc) (err error) {
+	newVehicle := models.Vehicle{
+		Id: v.ID,
+		VehicleAttributes: models.VehicleAttributes{
+			Brand:           v.Brand,
+			Model:           v.Model,
+			Registration:    v.Registration,
+			Color:           v.Color,
+			FabricationYear: v.FabricationYear,
+			Capacity:        v.Capacity,
+			MaxSpeed:        v.MaxSpeed,
+			FuelType:        v.FuelType,
+			Transmission:    v.Transmission,
+			Weight:          v.Weight,
+			Dimensions: models.Dimensions{
+				Height: v.Height,
+				Length: v.Length,
+				Width:  v.Width,
+			},
+		},
+	}
+
+	if err := newVehicle.Validate(); err != nil {
+		return err
+	}
+
+	err = s.rp.Create(newVehicle)
 	return err
 }

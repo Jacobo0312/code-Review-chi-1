@@ -6,7 +6,7 @@ import (
 )
 
 var (
-	errVehicleAlreadyExists = errors.New("vehicle already exists")
+	ErrVehicleAlreadyExists = errors.New("vehicle already exists")
 )
 
 // NewVehicleMap is a function that returns a new instance of VehicleMap
@@ -46,7 +46,7 @@ func (r *VehicleMap) Create(v models.Vehicle) (err error) {
 	_, ok := r.db[id]
 
 	if ok {
-		return errVehicleAlreadyExists
+		return ErrVehicleAlreadyExists
 	}
 
 	//Insert
