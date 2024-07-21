@@ -5,10 +5,6 @@ import (
 	"errors"
 )
 
-var (
-	ErrVehicleAlreadyExists = errors.New("vehicle already exists")
-)
-
 // NewVehicleMap is a function that returns a new instance of VehicleMap
 func NewVehicleMap(db map[int]models.Vehicle) *VehicleMap {
 	// default db
@@ -46,11 +42,31 @@ func (r *VehicleMap) Create(v models.Vehicle) (err error) {
 	_, ok := r.db[id]
 
 	if ok {
-		return ErrVehicleAlreadyExists
+		return errors.New("id already exist")
 	}
 
 	//Insert
 	r.db[id] = v
 
 	return nil
+}
+
+func (r *VehicleMap) GetByBrandAndYear(brand string, startYear int, endYear int) (v map[int]models.Vehicle) {
+	v = make(map[int]models.Vehicle)
+
+	// copy db
+	for key, value := range r.db {
+
+		if value.Brand != brand {
+			continue
+		}
+
+		if value.FabricationYear >= startYear && value.FabricationYear <= endYear {
+			v[key] = value
+		}
+
+	}
+
+	return
+
 }

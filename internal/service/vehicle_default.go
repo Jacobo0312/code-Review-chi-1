@@ -3,6 +3,13 @@ package service
 import (
 	"app/internal/repository"
 	"app/pkg/models"
+	"errors"
+	"strconv"
+)
+
+var (
+	ErrVehicleAlreadyExists = errors.New("vehicle already exists")
+	ErrVehiclesNotFound     = errors.New("no se encontraron vehículos con esos criterios.")
 )
 
 // NewVehicleDefault is a function that returns a new instance of VehicleDefault
@@ -50,5 +57,33 @@ func (s *VehicleDefault) Create(v models.VehicleDoc) (err error) {
 	}
 
 	err = s.rp.Create(newVehicle)
-	return err
+	if err != nil {
+		return ErrVehicleAlreadyExists
+	}
+
+	return nil
+}
+
+func (s *VehicleDefault) GetByBrandAndYear(brand string, startYear string, endYear string) (v map[int]models.Vehicle, err error) {
+
+	start, err := strconv.Atoi(startYear)
+
+	if err != nil {
+		return nil, err
+	}
+
+	end, err := strconv.Atoi(endYear)
+
+	if err != nil {
+		return nil, err
+	}
+
+	v = s.rp.GetByBrandAndYear(brand, start, end)
+
+	if len(v) == 0 {
+		return nil, ErrVehiclesNotFound
+	}
+
+	return v, nil
+
 }

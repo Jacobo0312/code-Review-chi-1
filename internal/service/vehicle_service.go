@@ -9,4 +9,7 @@ type VehicleService interface {
 
 	//Create is a method that add vehicle to map returns a error if vehicle already exist
 	Create(v models.VehicleDoc) (err error)
+
+	//GetByBrandAndYear is method that returns a map of vehicles of specific brand and  manufactured over a range of years.
+	GetByBrandAndYear(brand string, startYear string, endYear string) (v map[int]models.Vehicle, err error)
 }

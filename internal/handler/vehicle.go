@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"app/internal/repository"
 	"app/internal/service"
 	appErrors "app/pkg/errors"
 	"app/pkg/helpers"
@@ -12,6 +11,7 @@ import (
 	"net/http"
 
 	"github.com/bootcamp-go/web/response"
+	"github.com/go-chi/chi/v5"
 )
 
 // NewVehicleDefault is a function that returns a new instance of VehicleDefault
@@ -85,7 +85,7 @@ func (h *VehicleDefault) Create() http.HandlerFunc {
 			log.Println(err)
 
 			//Comparate  vehicle already exists
-			if errors.Is(err, repository.ErrVehicleAlreadyExists) {
+			if errors.Is(err, service.ErrVehicleAlreadyExists) {
 				helpers.RespondWithError(w, appErrors.NewConflict("Identificador del vehículo ya existente."))
 				return
 			}
@@ -95,6 +95,27 @@ func (h *VehicleDefault) Create() http.HandlerFunc {
 		}
 
 		helpers.RespondWithJSON(w, http.StatusCreated, newVehicleDoc)
+
+	}
+}
+
+//GET /vehicles/brand/{brand}/between/{start_year}/{end_year}
+//200 OK: Devuelve una lista de vehículos que cumplen con los criterios.
+//404 Not Found: No se encontraron vehículos con esos criterios.
+
+func (h *VehicleDefault) GetByBrandAndYear() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		brand := chi.URLParam(r, "brand")
+		startYear := chi.URLParam(r, "start_year")
+		endYear := chi.URLParam(r, "end_year")
+
+		vehicles, err := h.sv.GetByBrandAndYear(brand, startYear, endYear)
+		if err != nil {
+			helpers.RespondWithError(w, appErrors.NewNotFound("No se encontraron vehículos con esos criterios.", err))
+			return
+		}
+
+		helpers.RespondWithJSON(w, http.StatusOK, vehicles)
 
 	}
 }
