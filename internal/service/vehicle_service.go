@@ -12,4 +12,6 @@ type VehicleService interface {
 
 	//GetByBrandAndYear is method that returns a map of vehicles of specific brand and  manufactured over a range of years.
 	GetByBrandAndYear(brand string, startYear string, endYear string) (v map[int]models.Vehicle, err error)
+
+	GetByColorAndYear(color string, year string) (v map[int]models.Vehicle, err error)
 }

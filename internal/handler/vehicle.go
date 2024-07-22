@@ -119,3 +119,30 @@ func (h *VehicleDefault) GetByBrandAndYear() http.HandlerFunc {
 
 	}
 }
+
+// GET /vehicles/color/{color}/year/{year}
+// 200 OK: Devuelve una lista de vehículos que cumplen con los criterios.
+// 404 Not Found: No se encontraron vehículos con esos criterios.
+
+func (h *VehicleDefault) GetByColorAndYear() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		color := chi.URLParam(r, "color")
+		year := chi.URLParam(r, "year")
+
+		v, err := h.sv.GetByColorAndYear(color, year)
+
+		if err != nil {
+			if errors.Is(err, service.ErrVehiclesNotFound) {
+				helpers.RespondWithError(w, appErrors.NewNotFound("No se encontraron vehículos con esos criterios.", err))
+			} else {
+				helpers.RespondWithError(w, appErrors.NewBadRequest(err.Error(), err))
+			}
+
+			return
+		}
+
+		helpers.RespondWithJSON(w, http.StatusAccepted, v)
+
+	}
+}

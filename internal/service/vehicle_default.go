@@ -87,3 +87,20 @@ func (s *VehicleDefault) GetByBrandAndYear(brand string, startYear string, endYe
 	return v, nil
 
 }
+
+func (s *VehicleDefault) GetByColorAndYear(color string, y string) (v map[int]models.Vehicle, err error) {
+
+	year, err := strconv.Atoi(y)
+
+	if err != nil {
+		return nil, err
+	}
+
+	v = s.rp.GetByColorAndYear(color, year)
+
+	if len(v) == 0 {
+		return nil, ErrVehiclesNotFound
+	}
+
+	return
+}

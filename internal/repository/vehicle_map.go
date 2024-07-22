@@ -66,7 +66,18 @@ func (r *VehicleMap) GetByBrandAndYear(brand string, startYear int, endYear int)
 		}
 
 	}
-
 	return
+}
 
+func (r *VehicleMap) GetByColorAndYear(color string, year int) (v map[int]models.Vehicle) {
+	v = make(map[int]models.Vehicle)
+
+	for key, value := range r.db {
+
+		if value.FabricationYear == year && value.Color == color {
+			v[key] = value
+		}
+
+	}
+	return
 }

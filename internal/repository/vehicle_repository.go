@@ -14,4 +14,6 @@ type VehicleRepository interface {
 
 	//GetByBrandAndYear is method that returns a map of vehicles of specific brand and  manufactured over a range of years.
 	GetByBrandAndYear(brand string, startYear int, endYear int) (v map[int]models.Vehicle)
+
+	GetByColorAndYear(color string, year int) (v map[int]models.Vehicle)
 }
