@@ -81,3 +81,16 @@ func (r *VehicleMap) GetByColorAndYear(color string, year int) (v map[int]models
 	}
 	return
 }
+
+func (r *VehicleMap) GetByRangeWeight(min float64, max float64) (v map[int]models.Vehicle) {
+
+	v = make(map[int]models.Vehicle)
+
+	for key, value := range r.db {
+		if value.Weight > min && value.Weight < max {
+			v[key] = value
+		}
+	}
+
+	return
+}

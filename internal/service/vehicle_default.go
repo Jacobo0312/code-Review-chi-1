@@ -9,7 +9,7 @@ import (
 
 var (
 	ErrVehicleAlreadyExists = errors.New("vehicle already exists")
-	ErrVehiclesNotFound     = errors.New("no se encontraron vehículos con esos criterios.")
+	ErrVehiclesNotFound     = errors.New("no se encontraron vehículos con esos criterios")
 )
 
 // NewVehicleDefault is a function that returns a new instance of VehicleDefault
@@ -103,4 +103,27 @@ func (s *VehicleDefault) GetByColorAndYear(color string, y string) (v map[int]mo
 	}
 
 	return
+}
+
+func (s *VehicleDefault) GetByRangeWeight(min string, max string) (v map[int]models.Vehicle, err error) {
+
+	minWeight, err := strconv.ParseFloat(min, 64)
+
+	if err != nil {
+		return nil, err
+	}
+	maxWeight, err := strconv.ParseFloat(max, 64)
+
+	if err != nil {
+		return nil, err
+	}
+
+	v = s.rp.GetByRangeWeight(minWeight, maxWeight)
+
+	if len(v) == 0 {
+		return nil, ErrVehiclesNotFound
+	}
+
+	return
+
 }

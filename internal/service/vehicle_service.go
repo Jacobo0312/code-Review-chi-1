@@ -14,4 +14,6 @@ type VehicleService interface {
 	GetByBrandAndYear(brand string, startYear string, endYear string) (v map[int]models.Vehicle, err error)
 
 	GetByColorAndYear(color string, year string) (v map[int]models.Vehicle, err error)
+
+	GetByRangeWeight(min string, max string) (v map[int]models.Vehicle, err error)
 }

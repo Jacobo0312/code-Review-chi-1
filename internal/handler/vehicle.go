@@ -135,9 +135,9 @@ func (h *VehicleDefault) GetByColorAndYear() http.HandlerFunc {
 		if err != nil {
 			if errors.Is(err, service.ErrVehiclesNotFound) {
 				helpers.RespondWithError(w, appErrors.NewNotFound("No se encontraron vehículos con esos criterios.", err))
-			} else {
-				helpers.RespondWithError(w, appErrors.NewBadRequest(err.Error(), err))
+				return
 			}
+			helpers.RespondWithError(w, appErrors.NewBadRequest(err.Error(), err))
 
 			return
 		}
@@ -145,4 +145,34 @@ func (h *VehicleDefault) GetByColorAndYear() http.HandlerFunc {
 		helpers.RespondWithJSON(w, http.StatusAccepted, v)
 
 	}
+}
+
+// GET /vehicles/weight?min={weight_min}&max={weight_max}
+// 200 OK: Devuelve una lista de vehículos que están en el rango de peso especificado.
+// 404 Not Found: No se encontraron vehículos en ese rango de peso.
+
+func (h *VehicleDefault) GetByRangeWeight() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		queryParams := r.URL.Query()
+
+		min := queryParams.Get("min")
+		max := queryParams.Get("max")
+
+		v, err := h.sv.GetByRangeWeight(min, max)
+
+		if err != nil {
+
+			if errors.Is(err, service.ErrVehiclesNotFound) {
+				helpers.RespondWithError(w, appErrors.NewNotFound("No se encontraron vehículos en ese rango de peso.", err))
+				return
+			}
+
+			helpers.RespondWithError(w, appErrors.NewBadRequest(err.Error(), err))
+			return
+		}
+
+		helpers.RespondWithJSON(w, http.StatusAccepted, v)
+	}
+
 }

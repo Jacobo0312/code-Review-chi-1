@@ -16,4 +16,6 @@ type VehicleRepository interface {
 	GetByBrandAndYear(brand string, startYear int, endYear int) (v map[int]models.Vehicle)
 
 	GetByColorAndYear(color string, year int) (v map[int]models.Vehicle)
+
+	GetByRangeWeight(min float64, max float64) (v map[int]models.Vehicle)
 }
